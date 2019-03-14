@@ -1,6 +1,6 @@
 # CS351 Project 1
 
-Samantha Yee
+Samantha Yee samanthayee@csu.fullerton.edu
 
 
 Kate Torres k.torres97@csu.fullerton.edu
