@@ -45,10 +45,19 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 	
 	/* TODO: Allocate a piece of shared memory. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE. */
-	int shid; //id for shared memory
-	shid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, *shmid);
+	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, 0666);
+	if(shmid < 0)
+	{
+		perror("shmget");
+		exit(1);
+	}
 	/* TODO: Attach to the shared memory */
-	shmat(shid, nullptr, *shmid);
+	sharedMemPtr = shmat(shmid, nullptr, 0)
+	if(sharedMemPtr == (void*)-1)
+	{
+		perror("shmat");
+		exit(1);
+	}
 	/* TODO: Create a message queue */
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
 	
