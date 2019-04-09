@@ -60,7 +60,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	}
 	/* TODO: Create a message queue */
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
-	
+	msqid = msgget(key, 0666 | IPC_CREAT);
 }
  
 
@@ -134,10 +134,11 @@ void mainLoop()
 void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
 	/* TODO: Detach from shared memory */
-	
+	shmdt(sharedMemPtr);
 	/* TODO: Deallocate the shared memory chunk */
-	
+	shmctl(sharedMemPtr, IPC_RMID, NULL);
 	/* TODO: Deallocate the message queue */
+	msgctl(sharedMemPtr, IPC_RMID, NULL);
 }
 
 /**
