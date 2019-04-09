@@ -112,11 +112,12 @@ void send(const char* fileName)
 		/* TODO: Send a message to the receiver telling him that the data is ready 
  		 * (message of type SENDER_DATA_TYPE) 
  		 */
-		mggsend
+		msgsnd(int msqid, sndMsg.mtype, sndMsg.size, 1);
 		
 		/* TODO: Wait until the receiver sends us a message of type RECV_DONE_TYPE telling us 
  		 * that he finished saving the memory chunk. 
  		 */
+		msgsnd(int msqid, rcvMsg.mtype, rcv.size, 2);
 	}
 	
 
