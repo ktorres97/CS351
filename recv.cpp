@@ -1,4 +1,3 @@
-
 #include <sys/shm.h>
 #include <sys/msg.h>
 #include <signal.h>
@@ -6,7 +5,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "msg.h"    /* For the message struct */
-
+#include <iostream>
+using namespace std;
 
 /* The size of the shared memory chunk */
 #define SHARED_MEMORY_CHUNK_SIZE 1000
@@ -23,66 +23,91 @@ const char recvFileName[] = "recvfile";
 
 /**
  * Sets up the shared memory segment and message queue
- * @param shmid - the id of the allocated shared memory 
+ * @param shmid - the id of the allocated shared memory
  * @param msqid - the id of the shared memory
  * @param sharedMemPtr - the pointer to the shared memory
  */
 
+message sndMsg, rcvMsg;
+
 void init(int& shmid, int& msqid, void*& sharedMemPtr)
 {
-	
+
 	/* TODO: 1. Create a file called keyfile.txt containing string "Hello world" (you may do
  		    so manually or from the code).
 	         2. Use ftok("keyfile.txt", 'a') in order to generate the key.
 		 3. Use the key in the TODO's below. Use the same key for the queue
 		    and the shared memory segment. This also serves to illustrate the difference
 		    between the key and the id used in message queues and shared memory. The id
-		    for any System V object (i.e. message queues, shared memory, and sempahores) 
+		    for any System V object (i.e. message queues, shared memory, and sempahores)
 		    is unique system-wide among all System V objects. Two objects, on the other hand,
 		    may have the same key.
 	 */
+	cout << "\nGenrating Key" << endl;
 	key_t key = ftok("keyfile.txt", 'a');
+	if(key < 0){
+		cerr << "Unable to create key" << endl; exit(1);
+	}
+	else{
+		cout << "Successfully created key" << endl;
+	}
 
-	
+
 	/* TODO: Allocate a piece of shared memory. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE. */
-	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, 0666);
-	if(shmid < 0)
-	{
-		perror("shmget");
-		exit(1);
+	cout << "\nAllocate piece of shared memory" << endl;
+	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, 0666 | IPC_CREAT);
+	if(shmid < 0){
+		cerr << "Unable to create the shared memory" << endl; exit(1);
 	}
+	else{
+		cout << "Successfully shared the memory" << endl;
+	}
+
+
 	/* TODO: Attach to the shared memory */
-	sharedMemPtr = shmat(shmid, nullptr, 0)
-	if(sharedMemPtr == (void*)-1)
-	{
-		perror("shmat");
-		exit(1);
+	cout << "\nAttach to shared memroy" << endl;
+	sharedMemPtr = shmat(shmid, nullptr, 0);
+	if(sharedMemPtr == (void*) - 1){
+		cerr << "Unable to attach to shared memory" << endl; exit(1);
 	}
+	else{
+		cout << "Successfully attached to shared memory" << endl;
+	}
+
 	/* TODO: Create a message queue */
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
+	cout << "\nCreate a message queue" << endl;
 	msqid = msgget(key, 0666 | IPC_CREAT);
+	if(msqid < 0)
+	{
+		cerr<< "Unable to create the message queue."<<endl;
+	}
+	else
+	{
+		cout<<"Successfully created the message queue."<<endl;
+	}
 }
- 
+
 
 /**
  * The main loop
  */
 void mainLoop()
 {
-	/* The size of the mesage */
-	int msgSize = 0;
-	
+	/* The size of the message */
+	int msgSize = 1;
+
 	/* Open the file for writing */
 	FILE* fp = fopen(recvFileName, "w");
-		
+
 	/* Error checks */
 	if(!fp)
 	{
-		perror("fopen");	
+		perror("fopen");
 		exit(-1);
 	}
-		
-    /* TODO: Receive the message and get the message size. The message will 
+
+    /* TODO: Receive the message and get the message size. The message will
      * contain regular information. The message will be of SENDER_DATA_TYPE
      * (the macro SENDER_DATA_TYPE is defined in msg.h).  If the size field
      * of the message is not 0, then we copy that many bytes from the shared
@@ -95,10 +120,21 @@ void mainLoop()
 
 	/* Keep receiving until the sender set the size to 0, indicating that
  	 * there is no more data to send
- 	 */	
+ 	 */
 
 	while(msgSize != 0)
-	{	
+	{
+		cout<<"\nIncoming new Message"<<endl;
+		if(msgrcv(msqid, &rcvMsg, sizeof(rcvMsg), SENDER_DATA_TYPE, 0) < 0)
+		{
+			cerr << "Unable to read message" << endl; exit(1);
+		}
+		else{
+			cout << "Successfully read the message" << endl;
+		}
+		msgSize = rcvMsg.size;
+
+
 		/* If the sender is not telling us that we are done, then get to work */
 		if(msgSize != 0)
 		{
@@ -107,11 +143,20 @@ void mainLoop()
 			{
 				perror("fwrite");
 			}
-			
-			/* TODO: Tell the sender that we are ready for the next file chunk. 
+
+			/* TODO: Tell the sender that we are ready for the next file chunk.
  			 * I.e. send a message of type RECV_DONE_TYPE (the value of size field
- 			 * does not matter in this case). 
+ 			 * does not matter in this case).
  			 */
+			cout << "Hey sender, ready for the next file chunk." << endl;
+			sndMsg.mtype = RECV_DONE_TYPE;
+			sndMsg.size = 0;
+			if(msgsnd(msqid, &sndMsg, 0, 0) < 0)
+			{
+				cerr<<"Fail to send message"<<endl;
+			}else{
+				cout<<"Successfully sent message"<<endl;
+			}
 		}
 		/* We are done */
 		else
@@ -134,11 +179,33 @@ void mainLoop()
 void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
 	/* TODO: Detach from shared memory */
-	shmdt(sharedMemPtr);
+	cout << "\nDetach from shared memory" << endl;
+	if(shmdt(sharedMemPtr) < 0){
+		cerr << "Unable to detach from shared memory" << endl;
+	}
+	else{
+		cout << "Successfully detached from shared memory" << endl;
+	}
+
+
 	/* TODO: Deallocate the shared memory chunk */
-	shmctl(sharedMemPtr, IPC_RMID, NULL);
+	cout << "\nDeallocate the shared memory chunk" << endl;
+	if(shmctl(shmid, IPC_RMID, NULL) < 0){
+		cerr << "Unable to deallocate the shared memory chunk" << endl;
+	}
+	else{
+		cout << "Successfully deallocated the shared memory chunk" << endl;
+	}
+
+
 	/* TODO: Deallocate the message queue */
-	msgctl(sharedMemPtr, IPC_RMID, NULL);
+	cout << "\nDeallocate the message queue" << endl;
+	if(msgctl(msqid, IPC_RMID, NULL) < 0){
+		cerr << "Unable to deallocate the message queue" << endl;
+	}
+	else{
+		cout << "Successfully deallocated the message queue" << endl;
+	}
 }
 
 /**
@@ -154,20 +221,23 @@ void ctrlCSignal(int signal)
 
 int main(int argc, char** argv)
 {
-	
+
 	/* TODO: Install a singnal handler (see signaldemo.cpp sample file).
  	 * In a case user presses Ctrl-c your program should delete message
  	 * queues and shared memory before exiting. You may add the cleaning functionality
  	 * in ctrlCSignal().
  	 */
-				
+	signal(SIGINT,ctrlCSignal);
+
 	/* Initialize */
 	init(shmid, msqid, sharedMemPtr);
-	
+
 	/* Go to the main loop */
 	mainLoop();
 
 	/** TODO: Detach from shared memory segment, and deallocate shared memory and message queue (i.e. call cleanup) **/
-		
+	cleanUp(shmid, msqid, sharedMemPtr);
+
+
 	return 0;
 }
