@@ -38,6 +38,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	 */
 	key_t key = ftok("keyfile.txt", 'a');
 	cout << "\nCreate key for FTOK." << endl;
+	
 	if(key < 0){
 		cerr << "Unable to create key for FTOK" << endl; exit(1);
 	}
@@ -47,8 +48,9 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 
 	/* TODO: Get the id of the shared memory segment. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE */
-	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, IPC_CREAT | 0666);
 	cout << "\nCreate ID for shared memory." << endl;
+	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, IPC_CREAT | 0666);
+	
 	if(key < 0){
 		cerr << "Unable to create ID for shared memory" << endl; exit(1);
 	}
@@ -58,8 +60,9 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 
 	/* TODO: Attach to the shared memory */
-	sharedMemPtr = shmat(shmid, nullptr, 0);
 	cout << "\nAttach to shared memory" << endl;
+	sharedMemPtr = shmat(shmid, nullptr, 0);
+	
 	if(sharedMemPtr == (void*)-1){
 		cerr << "Unable to attach to shared memory" << endl; exit(1);
 	}
@@ -70,8 +73,9 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 	/* TODO: Attach to the message queue */
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
-	msqid = msgget(key, 0666 | IPC_CREAT);
 	cout << "\nAttach to message queue" << endl;
+	msqid = msgget(key, 0666 | IPC_CREAT);
+	
 	if(msqid < 0){
 		cerr<<"Unable to attach to message queue."<<endl;
 	}
@@ -91,8 +95,9 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
 	/* TODO: Detach from shared memory */
-	shmdt(sharedMemPtr);
 	cout << "\nDetaching from the shared memroy" << endl;
+	shmdt(sharedMemPtr);
+	
 	if(shmdt(sharedMemPtr) < 0){
 		cerr << "Unable to detach from the shared memory."<<endl; exit(1);
 	}
@@ -143,6 +148,7 @@ void send(const char* fileName)
  		 */
 		cout << "\nSending message to receiver" << endl;
 		sndMsg.mtype = SENDER_DATA_TYPE;
+		
 		if (msgsnd(msqid, &sndMsg, sndMsg.size, 0) < 0){
 			cerr << "Unable to send message, data not ready" << endl;
 		}
@@ -155,6 +161,7 @@ void send(const char* fileName)
  		 * that he finished saving the memory chunk.
  		 */
 		cout << "\nWait until the receiver sends us a message" << endl;
+		
 		if (msgrcv(msqid, &rcvMsg, 0, RECV_DONE_TYPE, 0) < 0){
 			cerr << "Unable to receive message" << endl; exit(1);
 		}
@@ -168,9 +175,10 @@ void send(const char* fileName)
  	  * Lets tell the receiver that we have nothing more to send. We will do this by
  	  * sending a message of type SENDER_DATA_TYPE with size field set to 0.
 	  */
+	cout << "\nWe have nothing more to send, send blank message" << endl;
 	sndMsg.size = 0;
 	sndMsg.mtype = SENDER_DATA_TYPE;
-	cout << "\nWe have nothing more to send, send blank message" << endl;
+	
 	if(msgsnd(msqid, &sndMsg, sizeof(sndMsg), 0) < 0)
 	{
 		cout<<"Unable to send blank message"<<endl;
