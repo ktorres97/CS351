@@ -45,8 +45,10 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	 */
 	cout << "\nGenrating Key" << endl;
 	key_t key = ftok("keyfile.txt", 'a');
+	
 	if(key < 0){
-		cerr << "Unable to create key" << endl; exit(1);
+		cerr << "Unable to create key" << endl; 
+		exit(1);
 	}
 	else{
 		cout << "Successfully created key" << endl;
@@ -56,8 +58,10 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	/* TODO: Allocate a piece of shared memory. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE. */
 	cout << "\nAllocate piece of shared memory" << endl;
 	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, 0666 | IPC_CREAT);
+	
 	if(shmid < 0){
-		cerr << "Unable to create the shared memory" << endl; exit(1);
+		cerr << "Unable to create the shared memory" << endl; 
+		exit(1);
 	}
 	else{
 		cout << "Successfully shared the memory" << endl;
@@ -67,8 +71,10 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	/* TODO: Attach to the shared memory */
 	cout << "\nAttach to shared memroy" << endl;
 	sharedMemPtr = shmat(shmid, nullptr, 0);
+	
 	if(sharedMemPtr == (void*) - 1){
-		cerr << "Unable to attach to shared memory" << endl; exit(1);
+		cerr << "Unable to attach to shared memory" << endl; 
+		exit(1);
 	}
 	else{
 		cout << "Successfully attached to shared memory" << endl;
@@ -78,13 +84,14 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
 	cout << "\nCreate a message queue" << endl;
 	msqid = msgget(key, 0666 | IPC_CREAT);
+	
 	if(msqid < 0)
 	{
-		cerr<< "Unable to create the message queue."<<endl;
+		cerr << "Unable to create the message queue." << endl;
 	}
 	else
 	{
-		cout<<"Successfully created the message queue."<<endl;
+		cout << "Successfully created the message queue." << endl;
 	}
 }
 
@@ -125,8 +132,8 @@ void mainLoop()
 	while(msgSize != 0)
 	{
 		cout<<"\nIncoming new Message"<<endl;
-		if(msgrcv(msqid, &rcvMsg, sizeof(rcvMsg), SENDER_DATA_TYPE, 0) < 0)
-		{
+		
+		if(msgrcv(msqid, &rcvMsg, sizeof(rcvMsg), SENDER_DATA_TYPE, 0) < 0){
 			cerr << "Unable to read message" << endl; exit(1);
 		}
 		else{
@@ -151,10 +158,11 @@ void mainLoop()
 			cout << "Hey sender, ready for the next file chunk." << endl;
 			sndMsg.mtype = RECV_DONE_TYPE;
 			sndMsg.size = 0;
-			if(msgsnd(msqid, &sndMsg, 0, 0) < 0)
-			{
+			
+			if(msgsnd(msqid, &sndMsg, 0, 0) < 0){
 				cerr<<"Fail to send message"<<endl;
-			}else{
+			}
+			else{
 				cout<<"Successfully sent message"<<endl;
 			}
 		}
@@ -180,6 +188,7 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
 	/* TODO: Detach from shared memory */
 	cout << "\nDetach from shared memory" << endl;
+	
 	if(shmdt(sharedMemPtr) < 0){
 		cerr << "Unable to detach from shared memory" << endl;
 	}
@@ -189,7 +198,9 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 
 
 	/* TODO: Deallocate the shared memory chunk */
+	
 	cout << "\nDeallocate the shared memory chunk" << endl;
+	
 	if(shmctl(shmid, IPC_RMID, NULL) < 0){
 		cerr << "Unable to deallocate the shared memory chunk" << endl;
 	}
@@ -199,7 +210,9 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 
 
 	/* TODO: Deallocate the message queue */
+	
 	cout << "\nDeallocate the message queue" << endl;
+	
 	if(msgctl(msqid, IPC_RMID, NULL) < 0){
 		cerr << "Unable to deallocate the message queue" << endl;
 	}
