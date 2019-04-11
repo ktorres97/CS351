@@ -16,6 +16,10 @@ Gregory Vasquez gvasquez11@csu.fullerton.edu Section 2
 Daniel Walsh danielwalsh27@csu.fullerton.edu Section 2
 
 
+Language Used: C++
+
+Environment: Linux
+
 
 Daniels Instructions:
 
@@ -31,7 +35,4 @@ Now open up another terminal window and runt he command "./recv" to read the mes
 
 
 
-Language Used: C++
-
-Environment: Linux
 
