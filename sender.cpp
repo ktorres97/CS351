@@ -91,7 +91,7 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
 	/* TODO: Detach from shared memory */
 	shmdt(sharedMemPtr);
-	cout << "\nDetaching from shared memroy" << endl;
+	cout << "\nDetaching from shared memory" << endl;
 	if(shmdt(sharedMemPtr) < 0){
 		cout << "FAILED: detach from the shared memory." << endl; exit(1);
 	}
@@ -169,14 +169,13 @@ void send(const char* fileName)
 	sndMsg.size = 0;
 	sndMsg.mtype = SENDER_DATA_TYPE;
 	cout << "\nsending a message of type SENDER_DATA_TYPE with size field set to 0" << endl;
-	if(msgsnd(msqid, &sndMsg, sizeof(sndMsg), 0) < 0)
-	{
+	if(msgsnd(msqid, &sndMsg, sizeof(sndMsg), 0) < 0){
 		cout << "FAILED: send blank message" << endl;
-	}else
+	}
+	else
 	{
 		cout << "PASS: sent blank message." << endl;
 	}
-
 
 	/* Close the file */
 	fclose(fp);
