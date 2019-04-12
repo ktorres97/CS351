@@ -73,11 +73,10 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	msqid = msgget(key, 0666 | IPC_CREAT);
 	cout << "\nAttach to message queue" << endl;
 	if(msqid < 0){
-		cerr<<"FAILED: attach to message queue."<<endl;
+		cerr << "FAILED: attach to message queue." << endl;
 	}
-	else
-	{
-		cout<<"PASS: attach to message queue."<<endl;
+	else{
+		cout << "PASS: attach to message queue." << endl;
 	}
 }
 
@@ -94,10 +93,9 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 	shmdt(sharedMemPtr);
 	cout << "\nDetaching from the shared memroy" << endl;
 	if(shmdt(sharedMemPtr) < 0){
-		cerr << "FAILED: detach from the shared memory."<<endl; exit(1);
+		cerr << "FAILED: detach from the shared memory." << endl; exit(1);
 	}
-	else
-	{
+	else{
 		cout << "PASS: detach from the shared memory." << endl;
 	}
 }
@@ -173,10 +171,10 @@ void send(const char* fileName)
 	cout << "\nWe have nothing more to send, send blank message" << endl;
 	if(msgsnd(msqid, &sndMsg, sizeof(sndMsg), 0) < 0)
 	{
-		cout<<"FAILED: send blank message"<<endl;
+		cout << "FAILED: send blank message" << endl;
 	}else
 	{
-		cout<<"PASS: sent blank message."<<endl;
+		cout << "PASS: sent blank message." << endl;
 	}
 
 
