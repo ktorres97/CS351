@@ -78,13 +78,11 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
 	cout << "\nCreate a message queue" << endl;
 	msqid = msgget(key, 0666 | IPC_CREAT);
-	if(msqid < 0)
-	{
-		cerr<< "FAILED: create the message queue."<<endl;
+	if(msqid < 0){
+		cerr << "FAILED: create the message queue." << endl;
 	}
-	else
-	{
-		cout<<"PASS: created the message queue."<<endl;
+	else{
+		cout << "PASS: created the message queue." << endl;
 	}
 }
 
@@ -130,7 +128,7 @@ void mainLoop()
 			cerr << "FAILED: new message" << endl; exit(1);
 		}
 		else{
-			cout << "PASSED: new message" << endl;
+			cout << "PASS: new message" << endl;
 		}
 		msgSize = rcvMsg.size;
 
@@ -148,14 +146,14 @@ void mainLoop()
  			 * I.e. send a message of type RECV_DONE_TYPE (the value of size field
  			 * does not matter in this case).
  			 */
-			cout << "Hey sender, ready for the next file chunk." << endl;
+			cout << "\nHey sender, ready for the next file chunk." << endl;
 			sndMsg.mtype = RECV_DONE_TYPE;
 			sndMsg.size = 0;
-			if(msgsnd(msqid, &sndMsg, 0, 0) < 0)
-			{
-				cerr<<"FAILED: send message"<<endl;
-			}else{
-				cout<<"PASS: sent message"<<endl;
+			if(msgsnd(msqid, &sndMsg, 0, 0) < 0){
+				cerr << "FAILED: send message" << endl;
+			}
+			else{
+				cout << "PASS: sent message" << endl;
 			}
 		}
 		/* We are done */
