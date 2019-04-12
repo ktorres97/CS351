@@ -43,10 +43,10 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 		    is unique system-wide among all System V objects. Two objects, on the other hand,
 		    may have the same key.
 	 */
-	cout << "\nGenrating Key" << endl;
+	cout << "\nUse ftok(keyfile.txt, a) in order to generate the key." << endl;
 	key_t key = ftok("keyfile.txt", 'a');
 	if(key < 0){
-		cerr << "FAILED: create key" << endl; exit(1);
+		cout << "FAILED: create key" << endl; exit(1);
 	}
 	else{
 		cout << "PASS: created key" << endl;
@@ -54,10 +54,10 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 
 	/* TODO: Allocate a piece of shared memory. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE. */
-	cout << "\nAllocate piece of shared memory" << endl;
+	cout << "\nAllocate a piece of shared memory." << endl;
 	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, 0666 | IPC_CREAT);
 	if(shmid < 0){
-		cerr << "FAILED: allocate piece of memory" << endl; exit(1);
+		cout << "FAILED: allocate piece of memory" << endl; exit(1);
 	}
 	else{
 		cout << "PASS: allocate piece of memory" << endl;
@@ -65,10 +65,10 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 
 	/* TODO: Attach to the shared memory */
-	cout << "\nAttach to shared memroy" << endl;
+	cout << "\nAttach to sharedthe  memroy" << endl;
 	sharedMemPtr = shmat(shmid, nullptr, 0);
 	if(sharedMemPtr == (void*) - 1){
-		cerr << "FAILED: attach to shared memory" << endl; exit(1);
+		cout << "FAILED: attach to shared memory" << endl; exit(1);
 	}
 	else{
 		cout << "PASS: attach to shared memory" << endl;
@@ -79,7 +79,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	cout << "\nCreate a message queue" << endl;
 	msqid = msgget(key, 0666 | IPC_CREAT);
 	if(msqid < 0){
-		cerr << "FAILED: create the message queue." << endl;
+		cout << "FAILED: create the message queue." << endl;
 	}
 	else{
 		cout << "PASS: created the message queue." << endl;
@@ -122,10 +122,10 @@ void mainLoop()
 
 	while(msgSize != 0)
 	{
-		cout<<"\nIncoming new Message"<<endl;
+		cout<<"\nReceive the message and get the message size"<<endl;
 		if(msgrcv(msqid, &rcvMsg, sizeof(rcvMsg), SENDER_DATA_TYPE, 0) < 0)
 		{
-			cerr << "FAILED: new message" << endl; exit(1);
+			cout << "FAILED: new message" << endl; exit(1);
 		}
 		else{
 			cout << "PASS: new message" << endl;
@@ -146,11 +146,11 @@ void mainLoop()
  			 * I.e. send a message of type RECV_DONE_TYPE (the value of size field
  			 * does not matter in this case).
  			 */
-			cout << "\nHey sender, ready for the next file chunk." << endl;
+			cout << "\nTell the sender that we are ready for the next file chunk." << endl;
 			sndMsg.mtype = RECV_DONE_TYPE;
 			sndMsg.size = 0;
 			if(msgsnd(msqid, &sndMsg, 0, 0) < 0){
-				cerr << "FAILED: send message" << endl;
+				cout << "FAILED: send message" << endl;
 			}
 			else{
 				cout << "PASS: sent message" << endl;
@@ -179,7 +179,7 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 	/* TODO: Detach from shared memory */
 	cout << "\nDetach from shared memory" << endl;
 	if(shmdt(sharedMemPtr) < 0){
-		cerr << "FAILED: detach from shared memory" << endl;
+		cout << "FAILED: detach from shared memory" << endl;
 	}
 	else{
 		cout << "PASS: detached from shared memory" << endl;
@@ -189,7 +189,7 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 	/* TODO: Deallocate the shared memory chunk */
 	cout << "\nDeallocate the shared memory chunk" << endl;
 	if(shmctl(shmid, IPC_RMID, NULL) < 0){
-		cerr << "FAILED: deallocate the shared memory chunk" << endl;
+		cout << "FAILED: deallocate the shared memory chunk" << endl;
 	}
 	else{
 		cout << "PASS: deallocated the shared memory chunk" << endl;
@@ -199,7 +199,7 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 	/* TODO: Deallocate the message queue */
 	cout << "\nDeallocate the message queue" << endl;
 	if(msgctl(msqid, IPC_RMID, NULL) < 0){
-		cerr << "FAILED: deallocate the message queue" << endl;
+		cout << "FAILED: deallocate the message queue" << endl;
 	}
 	else{
 		cout << "PASS: deallocated the message queue" << endl;
@@ -225,6 +225,7 @@ int main(int argc, char** argv)
  	 * queues and shared memory before exiting. You may add the cleaning functionality
  	 * in ctrlCSignal().
  	 */
+	cout << "\nInstall a singnal handler (see signaldemo.cpp sample file)" << endl;
 	signal(SIGINT,ctrlCSignal);
 
 	/* Initialize */
@@ -234,6 +235,7 @@ int main(int argc, char** argv)
 	mainLoop();
 
 	/** TODO: Detach from shared memory segment, and deallocate shared memory and message queue (i.e. call cleanup) **/
+	cout << "\nDetach from shared memory segment, and deallocate shared memory and message queue (i.e. call cleanup)" << endl;
 	cleanUp(shmid, msqid, sharedMemPtr);
 
 
