@@ -33,6 +33,16 @@ Then run the command "./sender keyfile.txt" to send the message.
 
 Now open up another terminal window and runt he command "./recv" to read the message.
 
+ROLES:
+
+Samantha Yee------Design/Written Documentation
+
+Kate Torres-------Implementation
+
+Gregory Vasquez---Design/ Written Documentation
+
+Daniel Walsh------Implementation
+
 
 
 
