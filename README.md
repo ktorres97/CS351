@@ -35,13 +35,13 @@ Now open up another terminal window and runt he command "./recv" to read the mes
 
 ROLES:
 
-Samantha Yee------Design/Written Documentation
+Samantha Yee-----Design/Written Documentation
 
-Kate Torres-------Implementation
+Kate Torres--------Implementation
 
-Gregory Vasquez---Design/ Written Documentation
+Gregory Vasquez--Design/ Written Documentation
 
-Daniel Walsh------Implementation
+Daniel Walsh-------Implementation
 
 
 
