@@ -38,50 +38,46 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	 */
 	key_t key = ftok("keyfile.txt", 'a');
 	cout << "\nCreate key for FTOK." << endl;
-	
 	if(key < 0){
-		cerr << "Unable to create key for FTOK" << endl; exit(1);
+		cerr << "FAILED: key for FTOK" << endl; exit(1);
 	}
 	else{
-		cout << "Successfully created key for FTOK" << endl;
+		cout << "PASS: created key for FTOK" << endl;
 	}
 
 
 	/* TODO: Get the id of the shared memory segment. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE */
-	cout << "\nCreate ID for shared memory." << endl;
 	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, IPC_CREAT | 0666);
-	
+	cout << "\nCreate ID for shared memory." << endl;
 	if(key < 0){
-		cerr << "Unable to create ID for shared memory" << endl; exit(1);
+		cerr << "FAILED: get ID for shared memory" << endl; exit(1);
 	}
 	else{
-		cout << "Successfully created id for shared memory" << endl;
+		cout << "PASS: get ID for shared memory" << endl;
 	}
 
 
 	/* TODO: Attach to the shared memory */
-	cout << "\nAttach to shared memory" << endl;
 	sharedMemPtr = shmat(shmid, nullptr, 0);
-	
+	cout << "\nAttach to shared memory" << endl;
 	if(sharedMemPtr == (void*)-1){
-		cerr << "Unable to attach to shared memory" << endl; exit(1);
+		cerr << "FAILED: attach to shared memory" << endl; exit(1);
 	}
 	else{
-		cout << "Successfully attached to shared memory" << endl;
+		cout << "PASS: attach to shared memory" << endl;
 	}
 
 
 	/* TODO: Attach to the message queue */
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
-	cout << "\nAttach to message queue" << endl;
 	msqid = msgget(key, 0666 | IPC_CREAT);
-	
+	cout << "\nAttach to message queue" << endl;
 	if(msqid < 0){
-		cerr<<"Unable to attach to message queue."<<endl;
+		cerr<<"FAILED: attach to message queue."<<endl;
 	}
 	else
 	{
-		cout<<"Successfully attached to message queue."<<endl;
+		cout<<"PASS: attach to message queue."<<endl;
 	}
 }
 
@@ -95,15 +91,14 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
 	/* TODO: Detach from shared memory */
-	cout << "\nDetaching from the shared memroy" << endl;
 	shmdt(sharedMemPtr);
-	
+	cout << "\nDetaching from the shared memroy" << endl;
 	if(shmdt(sharedMemPtr) < 0){
-		cerr << "Unable to detach from the shared memory."<<endl; exit(1);
+		cerr << "FAILED: detach from the shared memory."<<endl; exit(1);
 	}
 	else
 	{
-		cout << "Successfully detached from the shared memory." << endl;
+		cout << "PASS: detach from the shared memory." << endl;
 	}
 }
 
@@ -148,12 +143,11 @@ void send(const char* fileName)
  		 */
 		cout << "\nSending message to receiver" << endl;
 		sndMsg.mtype = SENDER_DATA_TYPE;
-		
 		if (msgsnd(msqid, &sndMsg, sndMsg.size, 0) < 0){
-			cerr << "Unable to send message, data not ready" << endl;
+			cerr << "FAILED: send message, data not ready" << endl;
 		}
 		else{
-			cout << "Successfully sent message, & ready the data is ready" << endl;
+			cout << "PASS: sent message, & ready the data is ready" << endl;
 		}
 
 
@@ -161,12 +155,11 @@ void send(const char* fileName)
  		 * that he finished saving the memory chunk.
  		 */
 		cout << "\nWait until the receiver sends us a message" << endl;
-		
 		if (msgrcv(msqid, &rcvMsg, 0, RECV_DONE_TYPE, 0) < 0){
-			cerr << "Unable to receive message" << endl; exit(1);
+			cerr << "FAILED: receive message" << endl; exit(1);
 		}
 		else{
-			cout << "Successfully received message from sender" << endl;
+			cout << "PASS: received message from sender" << endl;
 		}
 	}
 
@@ -175,16 +168,15 @@ void send(const char* fileName)
  	  * Lets tell the receiver that we have nothing more to send. We will do this by
  	  * sending a message of type SENDER_DATA_TYPE with size field set to 0.
 	  */
-	cout << "\nWe have nothing more to send, send blank message" << endl;
 	sndMsg.size = 0;
 	sndMsg.mtype = SENDER_DATA_TYPE;
-	
+	cout << "\nWe have nothing more to send, send blank message" << endl;
 	if(msgsnd(msqid, &sndMsg, sizeof(sndMsg), 0) < 0)
 	{
-		cout<<"Unable to send blank message"<<endl;
+		cout<<"FAILED: send blank message"<<endl;
 	}else
 	{
-		cout<<"Successfully sent the blank message."<<endl;
+		cout<<"PASS: sent blank message."<<endl;
 	}
 
 
