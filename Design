@@ -1,19 +1,22 @@
 //Introduction/Purpose
-This project...
+The purpose of this project is to show and apply principles of Inter-Process Communication(IPC).
+This project will expose us to using shared memory, message queues, signals, and working with both sender and receiver processes.
 
 //Project Overview
-In this project we...
+This project uses IPC in order to synchronously transfer files between two process, a sender and receiver.
+The sender will send files to the receiver process and the receiver will receive files from the sender.
 
 
 //Design Constraints
-A constraint that we had was having to use and implement our code into the given skeleton code. 
+A constraint that we had was having to use and implement our code into the given skeleton code.
+Another constraint was implementing the code into the said diagrams, making sure all key components were correct.
 
 //Responsibilities
 Name	                           Responsibilities
-Samantha Yee	
-Kate Torres	
-Gregory Vasquez	
-Daniel Walsh	
+Samantha Yee	                    Design/Written Documentation
+Kate Torres	                      Implementation
+Gregory Vasquez	                  Design/ Written Documentation
+Daniel Walsh	                    Implementation
 
 //Data Flow Diagram
 -How sender receiver works 
