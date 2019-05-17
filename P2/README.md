@@ -1,4 +1,4 @@
-# CS351 Project 1 
+# CS351 Project 2
 
 
 Samantha Yee samanthayee@csu.fullerton.edu Section 2
@@ -7,7 +7,7 @@ Samantha Yee samanthayee@csu.fullerton.edu Section 2
 Kate Torres k.torres97@csu.fullerton.edu Section 2
 
 
-Gregory Vasquez gvasquez11@csu.fullerton.edu Section 2 
+Gregory Vasquez gvasquez11@csu.fullerton.edu Section 2
 
 
 
