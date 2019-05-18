@@ -2,22 +2,52 @@
 #inclue <fstream>
 
 typedef struct _block{
-	struct _block *next; //Pointer to next block
 	bool	_free; //Is the block free
-	size_t size; //Size of memory block
-	void *memoryAddress; //Address of starting point
+	size_t memorySize; //Size of memory block
+	int begin; //Where the block starts
+	int end; //Where the  block ends
 	int pageNumber;
 	int n; //number of processes
 }_BLOCK;
 
-struct _workLoadInfo {
+struct Process {
 	int id;
-	int timeSubitted;
+	int arrivalTime;
 	int lifeTime;
-	int addressSpace;
-	vector<workLoad> memoryList;
+	int numOfpieces; //The number of pieces of memory on each line
+	int sizeOfMemoryPiece;
+	int totalAddressSpace; //The total address space
+	vector<int> memoryBlocks; //Holds the size of each memory block
 };
 
+void readFile(string fileName,int &numberOfProc, vector<Process>& processQ, vector<int>& list)
+{
+	Process p;
+	ifstream ifile;
+	ifile.open(fileName);
+	ifile >> numberOfProc;
+
+	for(int i = 0; i < numberOfProc; i++)
+	{
+		ifile >> p.id;
+		ifile >> p.arrivalTime;
+		ifile >> p.lifeTime;
+		ifile >> p.numOfpieces;
+
+		for(j = 0; j < p.numOfpieces; j++)
+		{
+				ifile >> sizeOfMemoryPiece;
+				p.totalAddressSpace += sizeOfMemoryPiece;
+				memoryBlocks.push_back(sizeOfMemoryPiece);
+		}
+
+		list.push_back(p.arrivalTime);
+		list.push_back(p.lifeTime);
+		processQ.push_back(p);
+		p.totalAddressSpace = 0;
+	}
+
+}
 #define BLOCK_SIZE sizeof(_BLOCK)
 
 _BLOCK *allocateMemBlock(size_t size){
@@ -44,16 +74,22 @@ void freeMemBlock(_BLOCK **head){
 	}
 }
 
-
 int main()
 {
+	int numberOfProcesses;
 	int memSize;
 	int pageSize;
 	string workLoad;
+	Process p;
+	vector<Process> processList;
+	vector<Process> processQ;
+	vector<Process> processReadyQ;
+	vector<_block> memoryList;
+	vector<int> list;
 
-	cout << "Enter the memory size in KBytes: "
+	cout << "Enter the memory size in KBytes > 2000: "
 	cin >> memSize;
-	cout << "Enter the page size: "
+	cout << "Enter the page size(1:100, 2:200, 3:400) > 3: "
 	cin >> pageSize;
 
 	switch (pageSize) {
@@ -68,23 +104,9 @@ int main()
 	cout << "Enter the Work Load File name: ";
 	cin >> workLoad;
 
+	readFile(workLoad, &numberOfProcesses, processQ, list);
 	int n;
-	int id;
-	int timeSubitted;
-	int lifeTime;
-	int addressSpace;
-	ifstream ifile;
-	ifile.open("workLoad");
-	ifile >> n;
 
-	for(int i = 0; i < n; i++)
-	{
-		ifile >> id;
-		ifile >> timeSubitted;
-		ifile >> lifeTime;
-		ifile >> addressSpace;
-
-	}
 	ifile.close();
 
 
