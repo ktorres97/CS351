@@ -1,0 +1,107 @@
+Design of Assignment 2
+
+//Introduction/Purpose
+The purpose of this project is to show a simulation having limited memory and memory management policies. This project has allowed us to understand the execution of the processes from input files and the decisions of the Memory Manager. 
+
+//Project Overview
+This project creates a simulator to execute the processes and the decisions of the Memory Manager. The simulator will generate an output file with its important events, along with the memory map and the input queue status after each event occurs. The simulator will then print out the average turnaround time per process. 
+
+//Design Constraints
+A constraint that we had was having to construct a skeleton for the code. Another constraint we had was implementing the code with its constraints, making sure all key components were correct.
+
+//Responsibilities
+Name			Responsibilities
+Samantha Yee		Design/Written Documentation
+Kate Torres		Implementation
+Gregory Vasquez	Implementation/ Design
+
+//Pseudo Code
+
+#include <fstream>, <iostream>, <stdio.h>, <fstream>, <string>, <vector>,<algorithm>
+
+Struct _block{
+Start at Next struct_block;
+declare variable Size;
+Create pointer to memoryAddress
+block free or not free;
+declare size memorySize;
+declare beginning (of where block starts), end (of where block ends), pageNumber, n (for number of processes);
+};
+
+Struct Process{
+Declare variables process ID, arrivalTime, lifeTime, numOfPiece, sizeOfMemoryPiece, 
+totalAddressSpace; 
+Create a vector that holds the size of each memory block;	
+};
+
+Function readFile(fileName, vectorProcessQ){
+	ProcessP;  //create a variable for Process
+	Declare totalProcesses;
+	Create vector with the variable blockSizedValue;
+	Declare blockValue;
+	
+//open file and read in;
+};
+
+Function memoryMap(memSize, pageSize, vectorMb){
+	_blockb; //create a variable for _block
+	Create loop to store onto memory;
+	Will return true when empty;
+	If not continues to add to the block;
+};
+
+Function actualTime(vectorTimeList, vectorProcessL){
+If _begin make false;
+If _end make false;
+
+Loop through size of processL;
+Loop and list the arrival time;
+};
+
+
+Int Main(){
+Declare numberOfProcesses, memSize, pageSize;
+Read Process ProcessList,ProcessQ, ProcessReadyQ;
+Read _block MemoryList;
+Read intList;
+
+Switch between case of given page sizes
+
+Allow user to input workLoad
+Print readFile
+Print memoryMap
+
+};
+
+Simplified structure:
+struct block
+struct process
+functions (getting called into the main)
+	void readfile
+	void memoryMap
+	*FreeMemBlock //done with everything in the memory it will delete all the code 
+	printOutput
+
+Main(){
+//main will create the process input que ask for user input
+//main calls from the read file with process queue while placing it into parameters
+//readfile is reading file and updating the que (FCFS order)
+//each item in the que is read by the memory map
+//MM Map function is called does what it needs to 
+//after each item is finished with MM function the freeMemblock function is called to free up memory for the next item
+//display function reads
+//functions return stuff to the main
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
