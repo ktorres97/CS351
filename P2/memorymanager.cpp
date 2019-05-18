@@ -1,11 +1,18 @@
 #include <stdio.h>
-#inclue <fstream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <iostream>
+using namespace std;
 
 typedef struct _block{
+	struct _block *next;
+	size_t size;
+	void * memoryAddress;
 	bool	_free; //Is the block free
 	size_t memorySize; //Size of memory block
 	int begin; //Where the block starts
-	int end; //Where the  block ends
+	int _end; //Where the  block ends
 	int pageNumber;
 	int n; //number of processes
 }_BLOCK;
@@ -20,34 +27,54 @@ struct Process {
 	vector<int> memoryBlocks; //Holds the size of each memory block
 };
 
-void readFile(string fileName,int &numberOfProc, vector<Process>& processQ, vector<int>& list)
+void readFile(string fileName, vector<Process>& processQ)
 {
 	Process p;
+	int totalProcesses;
+	vector<int> blockSizedValue; //Holds the sizes of each memory
+	int blockValue;
+
+	//Open file
 	ifstream ifile;
 	ifile.open(fileName);
-	ifile >> numberOfProc;
+	ifile >> totalProcesses;
 
-	for(int i = 0; i < numberOfProc; i++)
+	for(int i = 0; i < totalProcesses; i++)
 	{
 		ifile >> p.id;
 		ifile >> p.arrivalTime;
 		ifile >> p.lifeTime;
 		ifile >> p.numOfpieces;
 
-		for(j = 0; j < p.numOfpieces; j++)
+		for(int j = 0; j < p.numOfpieces; j++)
 		{
-				ifile >> sizeOfMemoryPiece;
-				p.totalAddressSpace += sizeOfMemoryPiece;
-				memoryBlocks.push_back(sizeOfMemoryPiece);
+				ifile >> blockValue;
+				p.totalAddressSpace += blockValue;
+				blockSizedValue.push_back(blockValue);
 		}
 
-		list.push_back(p.arrivalTime);
-		list.push_back(p.lifeTime);
+		p.memoryBlocks = blockSizedValue;
 		processQ.push_back(p);
-		p.totalAddressSpace = 0;
+	}
+	ifile.close();
+}
+
+void memoryMap(int memSize, int pageSize, vector<_block>& mb)
+{
+	_block b;
+	for(int i = 0; i < (memSize/pageSize); i++)
+	{
+		b.begin = i*pageSize;
+		b._end = (i+1)* pageSize - 1;
+		b.n = -1;
+		b._free = true;
+		mb.push_back(b);
+
 	}
 
 }
+
+/*
 #define BLOCK_SIZE sizeof(_BLOCK)
 
 _BLOCK *allocateMemBlock(size_t size){
@@ -61,8 +88,8 @@ _BLOCK *allocateMemBlock(size_t size){
 	else{	//Make new block
 		block->next = NULL;
 		block->_free = false;
-		block->size = size
-		block->memoryAddress = memadr+BLOCK_SIZE;
+		block->size = size;
+		block->memoryAddress = memAdd+BLOCK_SIZE;
 		return block;
 	}
 }
@@ -70,10 +97,10 @@ _BLOCK *allocateMemBlock(size_t size){
 void freeMemBlock(_BLOCK **head){
 	if(*head==NULL){}
 	else{
-		(*head)->free = true;
+		(*head)->_free = true;
 	}
 }
-
+*/
 int main()
 {
 	int numberOfProcesses;
@@ -87,9 +114,9 @@ int main()
 	vector<_block> memoryList;
 	vector<int> list;
 
-	cout << "Enter the memory size in KBytes > 2000: "
+	cout << "Enter the memory size in KBytes > 2000: ";
 	cin >> memSize;
-	cout << "Enter the page size(1:100, 2:200, 3:400) > 3: "
+	cout << "Enter the page size(1:100, 2:200, 3:400) > 3: ";
 	cin >> pageSize;
 
 	switch (pageSize) {
@@ -99,16 +126,13 @@ int main()
 			break;
 		case 3: pageSize = 400;
 			break;
-	};
+	}
 
 	cout << "Enter the Work Load File name: ";
 	cin >> workLoad;
 
-	readFile(workLoad, &numberOfProcesses, processQ, list);
+	readFile(workLoad, processQ);
 	int n;
-
-	ifile.close();
-
 
 
 	return 0;
