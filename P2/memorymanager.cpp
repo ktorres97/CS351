@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 typedef struct _block{
@@ -73,6 +74,45 @@ void memoryMap(int memSize, int pageSize, vector<_block>& mb)
 	}
 
 }
+/*
+void addToMemoryMap(Process p, vector<_block>& mb, vector<int> pages)
+{
+	for(int i = 0; i < pages.size(); i++)
+	{
+		for(int j = 0; j < mb.size(); j++)
+		{
+			if(pages[i] == mb[j].pageNumber)
+			{
+				mb[j]. = p.id;
+				mb[j]._end = p.lifeTime;
+				mb[j]._free = FALSE;
+			}
+		}
+
+	}
+
+}
+*/
+void actualTime(vector<int>& timeList, vector<Process>& processL)
+{
+	bool _begin = false;
+	bool _end = false;
+	for(int i = 0; i < processL.size(); i++)
+	{
+		for(int j = 0; j < timeList.size(); j++)
+		{
+			if(processL[i].arrivalTime == timeList[j])
+				_begin = true;
+			else if(processL[i].arrivalTime + processL[i].lifeTime == timeList[j])
+				_end = true;
+		}
+		if(!_begin)
+		timeList.push_back(processL[i].arrivalTime);
+		else if(!_end)
+		timeList.push_back(processL[i].lifeTime);
+	}
+	sort(timeList.begin(), timeList.end());
+}
 
 /*
 #define BLOCK_SIZE sizeof(_BLOCK)
@@ -132,8 +172,7 @@ int main()
 	cin >> workLoad;
 
 	readFile(workLoad, processQ);
-	int n;
-
+	memoryMap(memSize, pageSize, memoryList);
 
 	return 0;
 }
