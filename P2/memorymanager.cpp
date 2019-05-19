@@ -79,7 +79,7 @@ void removeFromMap(int &mSize, int& pSize, int& valueToRemove, vector<_block> &m
 	for(int i = 0; i < mp.size(); i++)
 	{
 			if(mp[i].n == valueToRemove)
-			mp[i]._free = true;
+				mp[i]._free = true;
 	}
 }
 
