@@ -68,11 +68,10 @@ void memoryMap(int& memSize, int& pageSize, vector<_block>& mb)
 		b.begin = i*pageSize;
 		b._end = (i+1)* pageSize - 1;
 		b.n = -1;
+		b.pageNumber = -1;
 		b._free = true;
 		mb.push_back(b);
-
 	}
-
 }
 
 void removeFromMap(int &mSize, int& pSize, int& valueToRemove, vector<_block> &mp)
@@ -83,25 +82,71 @@ void removeFromMap(int &mSize, int& pSize, int& valueToRemove, vector<_block> &m
 			mp[i]._free = true;
 	}
 }
-/*
-void addToMemoryMap(Process p, vector<_block>& mb, vector<int> pages)
-{
-	for(int i = 0; i < pages.size(); i++)
+
+bool addToMemoryMap(Process& p, vector<_block>& mp, int& mSize, int& pSize)
+{//(p, mp, mSize, pSize
+
+	double bs;
+	int bsi;
+	int s = -1;
+	int freeSpaceCounter;
+	int spaceValueUsed;
+	bool added = false;
+	int numPages = 1;
+
+	for(int i = 0; i < p.numOfpieces; i++)
 	{
-		for(int j = 0; j < mb.size(); j++)
-		{
-			if(pages[i] == mb[j].pageNumber)
+		bs = p.memoryBlocks[i] / pSize;
+
+		for(int j = i; j < p.numOfpieces; j++)
+			bs += (p.memoryBlocks[i]/ pSize);
+			bsi = (int) bs;
+
+			for(int x = 0; x < mp.size(); x++)
 			{
-				mb[j]. = p.id;
-				mb[j]._end = p.lifeTime;
-				mb[j]._free = FALSE;
+				if(mp[x]._free)
+				freeSpaceCounter++;
+				else
+				freeSpaceCounter = 0;
+				if(freeSpaceCounter == bsi)
+				spaceValueUsed = i + 1 - bsi;
+				else
+				spaceValueUsed = -1;
+
 			}
+
+			if(spaceValueUsed == -1)
+			{
+				bsi = (int) bs;
+				for(int x = 0; x < mp.size(); x++)
+				{
+					if(mp[x]._free)
+					freeSpaceCounter++;
+					else
+					freeSpaceCounter = 0;
+					if(freeSpaceCounter == bsi)
+					spaceValueUsed = i + 1 - bsi;
+					else
+					spaceValueUsed = -1;
+				}
+			}
+
+			if(spaceValueUsed > -1)
+			{
+					added = true;
+					for(int g = spaceValueUsed; g < spaceValueUsed + ((p.memoryBlocks[g] + 99)/pSize); g++)
+					{
+						mp[g].n = p.id;
+						mp[g]._free = false;
+						mp[g].pageNumber = numPages;
+						numPages++;
+					}
+
+			}
+
 		}
-
-	}
-
 }
-*/
+
 void actualTime(vector<int>& timeList, vector<Process>& processL)
 {
 	bool _begin;
@@ -143,25 +188,67 @@ void displayResult(vector<int>& timeList, vector<Process>& pl,int &mSize, int &p
 		{
 				if(pl[j].arrivalTime == timeList[i])
 					{
+							cout << " ";
 							q.push_back(pl[j].id);
 							cout << "Process " << pl[j].id << " arrives" << endl;
 							cout << "        Input Queue: [ ";
 							for(int x = 0; x < q.size(); x++)
 								cout << q[x] << " ";
-								cout << " ]" << endl;
+								cout << "]" << endl;
 					}
 				if(pl[j].arrivalTime + pl[j].lifeTime == timeList[i])
 				{
+						cout << " ";
 						//int &mSize, int& pSize, int& valueToRemove, vector<_block> &mp
-						cout << "Process " << pl[j].id << " arrives" << endl;
+						cout << "Process " << pl[j].id << " completes" << endl;
 						removeFromMap(mSize, pSize, pl[j].id, mp);
 
 
 				}
 		}
-		while (q.size() > 0)
+
+		while (q.size() != 0)
 		{
 				p = pl[q.front() - 1];
+				if(addToMemoryMap(p, mp, mSize, pSize))
+				{
+						cout << "   MM moves Process " << p.id << " to memory" << endl;
+						q.erase(q.begin());
+						cout << "   Input Queue: [ ";
+						for(int k = 0; k < q.size(); k++)
+						cout << q[k] << " ";
+						cout << "]" << endl;
+
+						//Print memory map
+						int mapCounter = 0 ;
+						int s = 0;
+						int e = 0;
+						while(mapCounter < (mSize/pSize))
+						{
+							if(!mp[mapCounter]._free)
+							{
+								if(s!= 0)
+								{
+									e = mapCounter - 1;
+									cout << "  " << s * pSize << "-" << ((e + 1) * pSize) - 1 << ": Free frames(s)" << endl;
+									s = 0;
+								}
+								cout << mp[mapCounter].begin << "-" << mp[mapCounter]._end << ": Process "
+								<< mp[mapCounter].n << " , Page " << mp[mapCounter].pageNumber << endl;
+							}
+								if( s == 0)
+								s = mapCounter;
+
+								mapCounter++;
+						}
+
+						if(s != 0)
+						{
+							e = mapCounter -1;
+							cout << s * pSize << "-" << ((e + 1) * pSize) - 1 << ": Free frame(s)" << endl;
+						}
+
+				}
 
 		}
 
