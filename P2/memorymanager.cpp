@@ -15,7 +15,7 @@ typedef struct _block{
 	int begin; //Where the block starts
 	int _end; //Where the  block ends
 	int pageNumber;
-	int n; //number of processes
+	int n; // process number
 }_BLOCK;
 
 struct Process {
@@ -28,7 +28,7 @@ struct Process {
 	vector<int> memoryBlocks; //Holds the size of each memory block
 };
 
-void readFile(string fileName, vector<Process>& processQ)
+void readFile(string fileName, vector<Process>& processList)
 {
 	Process p;
 	int totalProcesses;
@@ -55,12 +55,12 @@ void readFile(string fileName, vector<Process>& processQ)
 		}
 
 		p.memoryBlocks = blockSizedValue;
-		processQ.push_back(p);
+		processList.push_back(p);
 	}
 	ifile.close();
 }
 
-void memoryMap(int memSize, int pageSize, vector<_block>& mb)
+void memoryMap(int& memSize, int& pageSize, vector<_block>& mb)
 {
 	_block b;
 	for(int i = 0; i < (memSize/pageSize); i++)
@@ -73,6 +73,15 @@ void memoryMap(int memSize, int pageSize, vector<_block>& mb)
 
 	}
 
+}
+
+void removeFromMap(int &mSize, int& pSize, int& valueToRemove, vector<_block> &mp)
+{
+	for(int i = 0; i < mp.size(); i++)
+	{
+			if(mp[i].n == valueToRemove)
+			mp[i]._free = true;
+	}
 }
 /*
 void addToMemoryMap(Process p, vector<_block>& mb, vector<int> pages)
@@ -95,25 +104,76 @@ void addToMemoryMap(Process p, vector<_block>& mb, vector<int> pages)
 */
 void actualTime(vector<int>& timeList, vector<Process>& processL)
 {
-	bool _begin = false;
-	bool _end = false;
+	bool _begin;
+	bool _end;
 	for(int i = 0; i < processL.size(); i++)
 	{
+		_begin = false;
+		_end = false;
 		for(int j = 0; j < timeList.size(); j++)
 		{
 			if(processL[i].arrivalTime == timeList[j])
 				_begin = true;
-			else if(processL[i].arrivalTime + processL[i].lifeTime == timeList[j])
+			if(processL[i].arrivalTime + processL[i].lifeTime == timeList[j])
 				_end = true;
 		}
 		if(!_begin)
 		timeList.push_back(processL[i].arrivalTime);
-		else if(!_end)
+		if(!_end)
 		timeList.push_back(processL[i].lifeTime);
 	}
 	sort(timeList.begin(), timeList.end());
 }
 
+void displayResult(vector<int>& timeList, vector<Process>& pl,int &mSize, int &pSize)
+{
+	Process p;
+	vector<int> q;
+	vector<int> removeFromQ;
+	vector<_block> mp;
+
+//int memSize, int pageSize, vector<_block>& mb
+	memoryMap(mSize, pSize, mp);
+
+	for(int i = 0; i < timeList.size(); i++)
+	{
+		cout << "t = " << timeList[i] << ": ";
+
+		for(int j = 0; j < pl.size(); j++)
+		{
+				if(pl[j].arrivalTime == timeList[i])
+					{
+							q.push_back(pl[j].id);
+							cout << "Process " << pl[j].id << " arrives" << endl;
+							cout << "        Input Queue: [ ";
+							for(int x = 0; x < q.size(); x++)
+								cout << q[x] << " ";
+								cout << " ]" << endl;
+					}
+				if(pl[j].arrivalTime + pl[j].lifeTime == timeList[i])
+				{
+						//int &mSize, int& pSize, int& valueToRemove, vector<_block> &mp
+						cout << "Process " << pl[j].id << " arrives" << endl;
+						removeFromMap(mSize, pSize, pl[j].id, mp);
+
+
+				}
+		}
+		while (q.size() > 0)
+		{
+				p = pl[q.front() - 1];
+
+		}
+
+	}
+}
+
+void displayMemoryMap( vector<_block> &mp, int mSize, int pSize)
+{
+	cout << "Memory Map:" << endl;
+
+
+}
 /*
 #define BLOCK_SIZE sizeof(_BLOCK)
 
@@ -149,10 +209,9 @@ int main()
 	string workLoad;
 	Process p;
 	vector<Process> processList;
-	vector<Process> processQ;
 	vector<Process> processReadyQ;
 	vector<_block> memoryList;
-	vector<int> list;
+	vector<int> timeList;
 
 	cout << "Enter the memory size in KBytes > 2000: ";
 	cin >> memSize;
@@ -171,8 +230,9 @@ int main()
 	cout << "Enter the Work Load File name: ";
 	cin >> workLoad;
 
-	readFile(workLoad, processQ);
-	memoryMap(memSize, pageSize, memoryList);
+	readFile(workLoad, processList);
+	actualTime(timeList, processList);
+	displayResult(timeList,processList, memSize, pageSize);
 
 	return 0;
 }
